@@ -1,4 +1,3 @@
-﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -61,8 +60,7 @@ namespace BrunoMikoski.AnimationSequencer
                 if (EditorGUI.EndChangeCheck())
                     property.serializedObject.ApplyModifiedProperties();
             }
-
-
+            
             property.SetPropertyDrawerHeight(position.y - originY + EditorGUIUtility.singleLineHeight);
         }
         
@@ -76,9 +74,9 @@ namespace BrunoMikoski.AnimationSequencer
             return property.GetPropertyDrawerHeight();
         }
 
-        void DuplicateProperty(SerializedProperty property)
+        private void DuplicateProperty(SerializedProperty property)
         {
-            var parentArray = GetParentArrayProperty(property);
+            SerializedProperty parentArray = GetParentArrayProperty(property);
             if (parentArray != null && parentArray.isArray)
             {
                 int index = GetIndexInArray(property);
@@ -98,7 +96,7 @@ namespace BrunoMikoski.AnimationSequencer
             }
         }
 
-        SerializedProperty GetParentArrayProperty(SerializedProperty property)
+        private SerializedProperty GetParentArrayProperty(SerializedProperty property)
         {
             string path = property.propertyPath;
             int lastDot = path.LastIndexOf('.');
@@ -109,16 +107,16 @@ namespace BrunoMikoski.AnimationSequencer
             return property.serializedObject.FindProperty(arrayPath);
         }
 
-        int GetIndexInArray(SerializedProperty property)
+        private int GetIndexInArray(SerializedProperty property)
         {
-            var path = property.propertyPath;
-            var start = path.IndexOf("[") + 1;
-            var end = path.IndexOf("]");
-            var indexStr = path.Substring(start, end - start);
+            string path = property.propertyPath;
+            int start = path.IndexOf("[") + 1;
+            int end = path.IndexOf("]");
+            string indexStr = path.Substring(start, end - start);
             return int.Parse(indexStr);
         }
 
-        FieldInfo[] GetAllFieldsIncludingBaseTypes(Type type, BindingFlags flags)
+        private FieldInfo[] GetAllFieldsIncludingBaseTypes(Type type, BindingFlags flags)
         {
             List<FieldInfo> fields = new List<FieldInfo>();
             while (type != null)
@@ -129,19 +127,19 @@ namespace BrunoMikoski.AnimationSequencer
             return fields.ToArray();
         }
 
-        object CloneManagedReference(object obj, int depth = 2)
+        private object CloneManagedReference(object obj, int depth = 2)
         {
             if (obj == null) return null;
 
             if (depth == 0) return obj;
 
-            var type = obj.GetType();
+            Type type = obj.GetType();
             object clone = System.Activator.CreateInstance(type);
 
-            var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            var fields = GetAllFieldsIncludingBaseTypes(type , flags);// type.GetFields(flags);
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            FieldInfo[] fields = GetAllFieldsIncludingBaseTypes(type , flags);// type.GetFields(flags);
 
-            foreach (var field in fields)
+            foreach (FieldInfo field in fields)
             {
                 // Skip private/protected fields without [SerializeField] or [SerializeReference]
                 if (!field.IsPublic)
@@ -224,9 +222,9 @@ namespace BrunoMikoski.AnimationSequencer
             return clone;
         }
 
-        bool IsManagedReferenceField(FieldInfo field)
+        private bool IsManagedReferenceField(FieldInfo field)
         {
-            var fieldType = field.FieldType;
+            Type fieldType = field.FieldType;
 
             //we are not cloning any unity object
             if (fieldType == typeof(UnityEngine.Object))
