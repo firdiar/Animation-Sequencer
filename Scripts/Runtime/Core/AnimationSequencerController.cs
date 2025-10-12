@@ -131,12 +131,13 @@ namespace BrunoMikoski.AnimationSequencer
             ClearPlayingSequence();
         }
 
-        public virtual void Play()
+        public virtual Sequence Play()
         {
             Play(null);
+            return PlayingSequence;
         }
 
-        public virtual void Play(Action onCompleteCallback)
+        public virtual Sequence Play(Action onCompleteCallback)
         {
             playTypeInternal = playType;
 
@@ -161,9 +162,11 @@ namespace BrunoMikoski.AnimationSequencer
                     playingSequence.Play();
                     break;
             }
+
+            return PlayingSequence;
         }
 
-        public virtual void PlayForward(bool resetFirst = true, Action onCompleteCallback = null)
+        public virtual Sequence PlayForward(bool resetFirst = true, Action onCompleteCallback = null)
         {
             if (playingSequence == null)
                 Play();
@@ -177,9 +180,10 @@ namespace BrunoMikoski.AnimationSequencer
                 SetProgress(0);
 
             playingSequence.PlayForward();
+            return PlayingSequence;
         }
 
-        public virtual void PlayBackwards(bool completeFirst = true, Action onCompleteCallback = null)
+        public virtual Sequence PlayBackwards(bool completeFirst = true, Action onCompleteCallback = null)
         {
             if (playingSequence == null)
                 Play();
@@ -193,6 +197,7 @@ namespace BrunoMikoski.AnimationSequencer
                 SetProgress(1);
 
             playingSequence.PlayBackwards();
+            return PlayingSequence;
         }
 
         public virtual void SetTime(float seconds, bool andPlay = true)
