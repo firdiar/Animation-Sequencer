@@ -78,6 +78,7 @@ namespace BrunoMikoski.AnimationSequencer
         private Sequence playingSequence;
         public Sequence PlayingSequence => playingSequence;
         private PlayType playTypeInternal = PlayType.Forward;
+        private Action onCompleteCallback;
 #if UNITY_EDITOR
         private bool requiresReset = false;
 #endif
@@ -140,11 +141,9 @@ namespace BrunoMikoski.AnimationSequencer
         public virtual Sequence Play(Action onCompleteCallback)
         {
             playTypeInternal = playType;
+            this.onCompleteCallback = onCompleteCallback;
 
             ClearPlayingSequence();
-
-            if (onCompleteCallback != null)
-                onFinishedEvent.AddListener(onCompleteCallback.Invoke);
 
             playingSequence = GenerateSequence();
 
@@ -172,9 +171,7 @@ namespace BrunoMikoski.AnimationSequencer
                 Play();
 
             playTypeInternal = PlayType.Forward;
-
-            if (onCompleteCallback != null)
-                onFinishedEvent.AddListener(onCompleteCallback.Invoke);
+            this.onCompleteCallback = onCompleteCallback;
 
             if (resetFirst)
                 SetProgress(0);
@@ -189,9 +186,7 @@ namespace BrunoMikoski.AnimationSequencer
                 Play();
 
             playTypeInternal = PlayType.Backward;
-
-            if (onCompleteCallback != null)
-                onFinishedEvent.AddListener(onCompleteCallback.Invoke);
+            this.onCompleteCallback = onCompleteCallback;
 
             if (completeFirst)
                 SetProgress(1);
@@ -315,6 +310,7 @@ namespace BrunoMikoski.AnimationSequencer
                 else
                 {
                     onFinishedEvent.Invoke();
+                    onCompleteCallback?.Invoke();
                 }
             });
 
@@ -334,6 +330,7 @@ namespace BrunoMikoski.AnimationSequencer
                 if (playTypeInternal == PlayType.Forward)
                 {
                     onFinishedEvent.Invoke();
+                    onCompleteCallback?.Invoke();
                 }
                 else
                 {
